@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ゴルフスコア管理</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>⛳ ゴルフスコア管理</h1>
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-view="entry" role="tab">スコア入力</button>
+      <button class="tab" data-view="history" role="tab">履歴</button>
+      <button class="tab" data-view="stats" role="tab">成績</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- スコア入力 -->
+    <section id="view-entry" class="view active">
+      <form id="round-form" novalidate>
+        <div id="edit-banner" class="edit-banner" hidden>
+          記録を編集中です <button type="button" id="btn-cancel-edit" class="link">編集をやめる</button>
+        </div>
+
+        <div class="card meta">
+          <label>日付
+            <input type="date" id="f-date" required>
+          </label>
+          <div class="course-field">
+            <label for="f-course">コース</label>
+            <div class="course-input">
+              <input type="text" id="f-course" list="course-list" required placeholder="例: さくらカントリークラブ" autocomplete="off">
+              <select id="f-course-pick" aria-label="過去のコースから選ぶ" hidden></select>
+            </div>
+          </div>
+          <datalist id="course-list"></datalist>
+          <div class="wide start-field">
+            <span class="field-label">スタート</span>
+            <div class="segmented" role="radiogroup" aria-label="スタートホール">
+              <label><input type="radio" name="start" value="out" checked><span>OUT（1番〜）</span></label>
+              <label><input type="radio" name="start" value="in"><span>IN（10番〜）</span></label>
+            </div>
+          </div>
+          <label class="wide">メモ
+            <input type="text" id="f-memo" placeholder="天気・同伴者・反省点など">
+          </label>
+        </div>
+
+        <div class="card players-card">
+          <div class="players-head">
+            <h2>プレーヤー</h2>
+            <button type="button" id="btn-add-player" class="secondary small">＋ 同伴者を追加</button>
+          </div>
+          <div id="player-list"></div>
+          <p class="muted note">名前をタップするか、下の合計バーのボタンで入力するプレーヤーを切り替えます。過去の記録（ベスト・ワースト・成績）は先頭プレーヤーのスコアを使います。</p>
+          <datalist id="companion-list"></datalist>
+        </div>
+
+        <div class="card table-card">
+          <p class="mark-legend">
+            <span>◎ イーグル</span><span>○ バーディー</span><span>− パー</span><span>△ ボギー</span><span>□ ダブルボギー</span>
+            <span class="muted">をタップで入力。トリプルボギー以上は「打数」に数字で入力。ホール番号をタップすると過去の記録が見られます</span>
+          </p>
+          <table class="scorecard">
+            <thead>
+              <tr><th>H</th><th>Par</th><th>結果</th><th>打数</th><th>パット</th></tr>
+            </thead>
+            <tbody id="hole-rows"></tbody>
+          </table>
+        </div>
+
+        <div class="summary-bar">
+          <div class="player-switch" id="player-switch" hidden></div>
+          <div class="summary-text" id="summary-text">打数を入力してください</div>
+          <div class="actions">
+            <button type="button" id="btn-reset" class="secondary">クリア</button>
+            <button type="submit" id="btn-save" class="primary">保存</button>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <!-- 履歴 -->
+    <section id="view-history" class="view">
+      <div id="history-list"></div>
+    </section>
+
+    <!-- 成績 -->
+    <section id="view-stats" class="view">
+      <div class="card filter">
+        <label>対象コース
+          <select id="stats-course"></select>
+        </label>
+      </div>
+      <div id="stats"></div>
+
+      <div class="card backup">
+        <h2>データのバックアップ</h2>
+        <p class="muted">データはこのブラウザ内に保存されています。機種変更やブラウザのデータ削除に備えて、ときどき書き出しておくと安心です。</p>
+        <div class="actions">
+          <button type="button" id="btn-export" class="secondary">JSONで書き出す</button>
+          <label class="button secondary">JSONから読み込む
+            <input type="file" id="f-import" accept="application/json,.json" hidden>
+          </label>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="detail-dialog">
+    <div id="detail-body"></div>
+    <div class="actions">
+      <button type="button" id="btn-delete" class="danger">削除</button>
+      <button type="button" id="btn-edit" class="secondary">編集</button>
+      <button type="button" id="btn-close" class="primary">閉じる</button>
+    </div>
+  </dialog>
+
+  <dialog id="hole-dialog">
+    <div id="hole-body"></div>
+    <div class="actions">
+      <button type="button" id="btn-hole-close" class="primary">閉じる</button>
+    </div>
+  </dialog>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

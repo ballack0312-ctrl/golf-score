@@ -1,0 +1,459 @@
+/* ドイツカラー：Schwarz（黒）・Rot（赤）・Gold（金） */
+:root {
+  --de-black: #000000;
+  --de-red: #dd0000;
+  --de-gold: #ffce00;
+
+  --bg: #f6f5f2;
+  --surface: #ffffff;
+  --surface-2: #f0eee9;
+  --text: #1a1a1a;
+  --muted: #666360;
+  --border: #dedbd4;
+  --header: var(--de-black);
+  --header-text: #ffffff;
+  --primary: var(--de-red);
+  --primary-text: #ffffff;
+  --danger: var(--de-red);
+  --accent: var(--de-gold);
+
+  --row-odd: var(--surface);
+  --row-even: #fbf3d6;   /* 偶数ホール：ごく薄い金 */
+
+  --r-eagle: var(--de-gold);
+  --r-birdie: var(--de-red);
+  --r-par: transparent;
+  --r-bogey: #c8c6c1;
+  --r-double: #6b6966;
+  --r-triple: #1a1a1a;
+
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #111111;
+    --surface: #1c1c1c;
+    --surface-2: #272727;
+    --text: #eeeeee;
+    --muted: #a3a3a3;
+    --border: #3a3a3a;
+    --header: #000000;
+    --primary: #e8242b;
+    --danger: #ff5a5a;
+    --row-even: #2a2618;
+    --r-birdie: #e8242b;
+    --r-bogey: #a8a6a1;
+    --r-double: #5c5c5c;
+    --r-triple: #333333;
+    --shadow: none;
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Yu Gothic UI", Meiryo, sans-serif;
+  line-height: 1.5;
+}
+
+/* ---------- header / tabs ---------- */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--header);
+  color: var(--header-text);
+  padding: 12px 16px 0;
+}
+/* 黒いヘッダーの下に赤・金の帯を引いて国旗の三色に */
+.app-header::after {
+  content: '';
+  display: block;
+  height: 10px;
+  margin: 0 -16px;
+  background: linear-gradient(var(--de-red) 0 50%, var(--de-gold) 50% 100%);
+}
+.app-header h1 { margin: 0 0 8px; font-size: 1.2rem; }
+.tabs { display: flex; gap: 4px; }
+.tab {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: .75;
+  padding: 10px 4px;
+  font-size: .95rem;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+.tab.active { opacity: 1; font-weight: 700; border-bottom-color: #ffffff; }
+
+main { max-width: 760px; margin: 0 auto; padding: 16px; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* ---------- cards / forms ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.card h2 { margin: 0 0 10px; font-size: 1rem; }
+
+.meta { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; }
+.meta .wide { grid-column: 1 / -1; }
+@media (max-width: 520px) { .meta { grid-template-columns: 1fr; } }
+
+label { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; color: var(--muted); }
+
+/* プレーヤー（自分 + 同伴者） */
+.players-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.players-head h2 { margin: 0; }
+button.small { padding: 6px 12px; font-size: .85rem; }
+button:disabled { opacity: .45; cursor: not-allowed; }
+.player-row {
+  display: grid;
+  grid-template-columns: 1.8em 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+}
+.player-row + .player-row { margin-top: 4px; }
+.player-row.current { border-color: var(--primary); background: color-mix(in srgb, var(--primary) 6%, var(--surface)); }
+.p-no {
+  width: 1.6em; height: 1.6em; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--header); color: var(--header-text); font-size: .8rem; font-weight: 700;
+}
+.p-tag { font-size: .75rem; padding: 2px 8px; border-radius: 999px; background: var(--accent); color: #1a1a1a; font-weight: 700; }
+.p-remove { padding: 4px 10px; font-size: .8rem; background: transparent; border: 1px solid var(--border); color: var(--muted); }
+.players-card .note { font-size: .78rem; margin: 8px 0 0; }
+
+.player-switch { display: flex; gap: 6px; overflow-x: auto; flex-basis: 100%; padding-bottom: 2px; }
+.player-switch[hidden] { display: none; }
+.p-chip {
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding: 4px 12px;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  line-height: 1.25;
+  min-width: 5.5em;
+}
+.p-chip-name { font-size: .75rem; color: var(--muted); max-width: 8em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-chip-score { font-weight: 700; font-size: 1rem; }
+.p-chip-score small { font-weight: 400; font-size: .75rem; margin-left: 4px; color: var(--muted); }
+.p-chip.active { background: var(--primary); border-color: var(--primary); color: var(--primary-text); }
+.p-chip.active .p-chip-name, .p-chip.active small { color: var(--primary-text); opacity: .9; }
+
+/* 詳細スコアカードの同伴者行 */
+.h-card .pc-name { display: inline-block; max-width: 6em; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
+.h-card .pc-main th { color: var(--primary); }
+.h-card .pc-putts th, .h-card .pc-putts td { color: var(--muted); font-size: .78rem; }
+.h-card .pc-putt { padding-left: .8em; }
+.ri-comp { grid-column: 1; }
+.ri-score { grid-row: 1 / span 4; }
+
+/* コース名：入力 + 履歴から選ぶ */
+.course-field { display: flex; flex-direction: column; gap: 4px; }
+.course-input { display: flex; gap: 6px; }
+.course-input input { flex: 1; min-width: 0; }
+.course-input select {
+  width: auto;
+  flex: 0 0 auto;
+  max-width: 9.5em;
+  background: var(--surface-2);
+  font-size: .85rem;
+  cursor: pointer;
+}
+@media (max-width: 520px) {
+  .course-input { flex-direction: column; }
+  .course-input select { max-width: none; width: 100%; }
+}
+
+/* OUT / IN スタート切り替え */
+.start-field { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-size: .85rem; color: var(--muted); }
+.segmented { display: flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.segmented label { flex: 1; display: block; margin: 0; cursor: pointer; }
+.segmented input { position: absolute; opacity: 0; pointer-events: none; }
+.segmented span {
+  display: block;
+  text-align: center;
+  padding: 9px 6px;
+  font-size: .9rem;
+  color: var(--text);
+  background: var(--surface);
+}
+.segmented label + label span { border-left: 1px solid var(--border); }
+.segmented input:checked + span { background: var(--primary); color: var(--primary-text); font-weight: 700; }
+.segmented input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -3px; }
+.start-badge {
+  display: inline-block;
+  font-size: .7rem;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--header);
+  color: var(--header-text);
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+input, select {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px;
+  width: 100%;
+}
+input:focus, select:focus { outline: 2px solid var(--primary); outline-offset: 0; }
+input.invalid { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, var(--surface)); }
+
+button, .button {
+  font: inherit;
+  border-radius: 8px;
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: row;
+  color: var(--text);
+}
+.primary { background: var(--primary); color: var(--primary-text); font-weight: 700; }
+.secondary { background: var(--surface-2); border-color: var(--border); }
+.danger { background: transparent; border-color: var(--danger); color: var(--danger); }
+.link { background: none; border: 0; padding: 0; color: var(--primary); text-decoration: underline; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.muted { color: var(--muted); font-size: .9rem; }
+
+.edit-banner {
+  background: color-mix(in srgb, var(--accent) 25%, var(--surface));
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ---------- entry scorecard ---------- */
+.table-card { padding: 0; overflow-x: auto; }
+.scorecard { width: 100%; border-collapse: collapse; }
+.scorecard th, .scorecard td {
+  padding: 4px 6px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.scorecard thead th { background: var(--surface-2); font-size: .85rem; color: var(--muted); padding: 8px 6px; }
+.scorecard .hole-no { font-weight: 700; width: 2.5em; }
+.scorecard select, .scorecard input { text-align: center; padding: 6px 4px; }
+.scorecard select { width: 3.6em; }
+.scorecard input { width: 3.4em; }
+
+.mark-legend {
+  margin: 0;
+  padding: 8px 12px;
+  font-size: .8rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.mark-group { display: flex; gap: 4px; align-items: center; justify-content: center; flex-wrap: wrap; }
+.mark-row { display: flex; gap: inherit; flex-wrap: nowrap; }
+.mark {
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border-radius: 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.mark:hover { border-color: var(--primary); }
+.mark.active { color: #fff; border-color: transparent; }
+.mark.active[data-diff="-2"] { background: var(--r-eagle); color: #1a1a1a; }
+.mark.active[data-diff="-1"] { background: var(--r-birdie); }
+.mark.active[data-diff="0"]  { background: var(--text); color: var(--surface); }
+.mark.active[data-diff="1"]  { background: var(--r-bogey); color: #1a1a1a; }
+.mark.active[data-diff="2"]  { background: var(--r-double); }
+.mark-group .over:empty { display: none; }
+
+/* 同じホールの過去の記録 */
+.hole-btn {
+  padding: 4px 6px;
+  background: none;
+  border: 0;
+  font-weight: 700;
+  color: var(--text);
+}
+.hole-btn.has-ref { color: var(--primary); text-decoration: underline dotted; text-underline-offset: 3px; }
+.ref { font-size: .7rem; color: var(--muted); margin-top: 2px; line-height: 1.3; }
+.ref:empty { display: none; }
+.ref b { color: var(--text); margin: 0 4px 0 1px; }
+
+.hole-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin: 12px 0; text-align: center; }
+.hole-kpis > div { background: var(--surface-2); border-radius: 8px; padding: 8px 4px; }
+.hole-kpis .label, .hole-kpis .note { color: var(--muted); font-size: .75rem; }
+.hole-kpis .value { font-size: 1.3rem; font-weight: 700; }
+@media (max-width: 480px) { .hole-kpis { grid-template-columns: repeat(2, 1fr); } }
+.hole-list { max-height: 45vh; overflow-y: auto; }
+.hole-list table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.hole-list th, .hole-list td { padding: 6px 8px; border-bottom: 1px solid var(--border); text-align: left; }
+.hole-list th { color: var(--muted); font-size: .8rem; position: sticky; top: 0; background: var(--surface); }
+.hole-list .num { text-align: right; font-weight: 700; }
+.mark-group .over { font-size: .8rem; white-space: nowrap; }
+@media (max-width: 480px) {
+  main { padding: 12px 8px; }
+  .mark { width: 26px; height: 32px; font-size: 1rem; border-radius: 6px; }
+  .mark-group { gap: 2px; }
+  .scorecard th, .scorecard td { padding: 4px 1px; }
+  .scorecard .hole-no { width: 1.6em; }
+  .hole-btn { padding: 4px 1px; }
+  .scorecard select { width: 2.7em; padding: 6px 0; }
+  .scorecard input { width: 2.4em; padding: 6px 1px; }
+}
+.scorecard tr.hole-odd { background: var(--row-odd); }
+.scorecard tr.hole-even { background: var(--row-even); }
+.scorecard tr.subtotal { background: var(--surface-2); font-weight: 700; }
+.scorecard tr.subtotal.total { background: color-mix(in srgb, var(--accent) 30%, var(--surface)); }
+
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; }
+.r-eagle  { background: var(--r-eagle); color: #1a1a1a; }
+.r-birdie { background: var(--r-birdie); color: #fff; }
+.r-par    { background: var(--r-par); color: var(--muted); }
+.r-par-bar { background: var(--text); }
+.r-bogey  { background: var(--r-bogey); color: #1a1a1a; }
+.r-double { background: var(--r-double); color: #fff; }
+.r-triple { background: var(--r-triple); color: #fff; }
+
+.summary-bar {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, .08);
+}
+.summary-text { font-weight: 700; flex: 1 1 0; min-width: 0; }
+.summary-bar .actions { flex: 0 0 auto; flex-wrap: nowrap; }
+@media (max-width: 480px) {
+  .summary-bar { padding: 8px 10px; gap: 6px 8px; }
+  .summary-text { font-size: .8rem; line-height: 1.35; }
+  .summary-bar .actions button { padding: 8px 12px; }
+}
+
+/* ---------- history ---------- */
+.round-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 12px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+}
+.round-item:hover { border-color: var(--primary); }
+.ri-date { color: var(--muted); font-size: .85rem; }
+.ri-course { font-weight: 700; }
+.ri-score { grid-row: 1 / span 3; grid-column: 2; text-align: right; align-self: center; }
+.ri-score strong { font-size: 1.8rem; display: block; line-height: 1.1; }
+.ri-sub { color: var(--muted); font-size: .85rem; }
+.diff { font-size: .9rem; color: var(--muted); }
+
+.empty { text-align: center; padding: 40px 16px; color: var(--muted); }
+
+/* ---------- detail dialog ---------- */
+dialog {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  width: min(720px, calc(100vw - 32px));
+  padding: 16px;
+}
+dialog::backdrop { background: rgba(0, 0, 0, .45); }
+dialog h2 { margin: 0; font-size: 1.1rem; }
+dialog .actions { justify-content: flex-end; margin-top: 14px; }
+.detail-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; flex-wrap: wrap; }
+.detail-score { font-size: 1.6rem; font-weight: 700; }
+.h-scroll { overflow-x: auto; }
+.h-card { border-collapse: collapse; font-size: .85rem; min-width: 100%; }
+.h-card th, .h-card td { border: 1px solid var(--border); padding: 4px 6px; text-align: center; min-width: 2.2em; }
+.h-card thead th, .h-card .sub { background: var(--surface-2); font-weight: 700; }
+.h-card tbody th { text-align: left; white-space: nowrap; }
+.h-card .cell { border-radius: 4px; display: inline-block; min-width: 1.8em; }
+
+/* ---------- stats ---------- */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow); }
+.kpi .label { color: var(--muted); font-size: .8rem; }
+.kpi .value { font-size: 1.6rem; font-weight: 700; }
+.kpi .note { color: var(--muted); font-size: .75rem; }
+
+.bars { display: grid; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: 7em 1fr 4.5em; align-items: center; gap: 8px; font-size: .85rem; }
+.bar-track { background: var(--surface-2); border-radius: 4px; height: 14px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; }
+.bar-row .pct { text-align: right; color: var(--muted); }
+
+.par-avgs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center; }
+.par-avgs .value { font-size: 1.3rem; font-weight: 700; }
+
+.chart svg { width: 100%; height: auto; display: block; }
+.chart .grid { stroke: var(--border); stroke-width: 1; }
+.chart .axis-label { fill: var(--muted); font-size: 11px; }
+.chart .line { fill: none; stroke: var(--primary); stroke-width: 2.5; }
+.chart .dot { fill: var(--surface); stroke: var(--primary); stroke-width: 2; }
+.chart .avg { stroke: var(--accent); stroke-dasharray: 5 4; stroke-width: 1.5; }
+
+/* ---------- toast ---------- */
+#toast {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--text);
+  color: var(--bg);
+  padding: 10px 18px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 100;
+  max-width: calc(100vw - 32px);
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
